@@ -135,6 +135,11 @@ runeworks.utility = (function() {
     return combineArrays([combined, ...tailTail], sep)
   }
   
+  /*
+     let arr3 = [{head: 'A'}, {head: 'B'}, {head: 'C'}]
+     let arr4 = [{num: 1}, {num: 2}, {num: 3}]
+     console.log(combineObjects([arr3, arr4]))
+   */
   let combineObjects = ([head, ....[headTail, ...tailTail]]) => {
     if (!headTail) return head
     
