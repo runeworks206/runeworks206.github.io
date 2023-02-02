@@ -119,17 +119,45 @@ runeworks.utility = (function() {
     }
   }
   
+  /* https://stackoverflow.com/a/57015870 */
+  /*
+     let arr1 = ['A','B','C']
+     let arr2 = ['1','2','3']
+     console.log(combineArrays([arr1, arr2],'-'))
+   */
+  let combineArrays = ([head, ....[headTail, ...tailTail]], sep) => {
+    if (!headTail) return head
+    
+    const combined = headTail.reduce((acc, x) => {
+      return acc.concat(head.map(h => `${h}${sep ? sep : ''}${x}`))
+    }, [])
+    
+    return combineArrays([combined, ...tailTail], sep)
+  }
+  
+  let combineObjects = ([head, ....[headTail, ...tailTail]]) => {
+    if (!headTail) return head
+    
+    const combined = headTail.reduce((acc, x) => {
+      return acc.concat(head.map(h => ({...h, ...x})))
+    }, [])
+    
+    return combineObjects([combined, ...tailTail])
+  }
+  
   return {
-    clean   : clean,
-    clone   : clone,
-    comma   : commaThis,
-    interval: interval,
-    key     : key,
-    round   : round,
-    uniqueArray: uniqueArray,
-    uuid       : uuid,
-    title      : title,
-    sort_by    : sort_by,
-    chainSort  : chainSortBy,
+    clean         : clean,
+    clone         : clone,
+    comma         : commaThis,
+    interval      : interval,
+    key           : key,
+    round         : round,
+    uniqueArray   : uniqueArray,
+    uuid          : uuid,
+    title         : title,
+    sort_by       : sort_by,
+    chainSort     : chainSortBy,
+    combineArrays : combineArrays,
+    combineObjects: combineObjects,
   }
 })()
