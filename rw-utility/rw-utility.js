@@ -125,7 +125,7 @@ runeworks.utility = (function() {
      let arr2 = ['1','2','3']
      console.log(combineArrays([arr1, arr2],'-'))
    */
-  let combineArrays = ([head, ....[headTail, ...tailTail]], sep) => {
+  let combineArrays = ([head, ...[headTail, ...tailTail]], sep) => {
     if (!headTail) return head
     
     const combined = headTail.reduce((acc, x) => {
