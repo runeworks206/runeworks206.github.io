@@ -29,6 +29,8 @@ runeworks.chatbox = (function() {
     // Parent
     parent          : 'body',
     // Container
+    left            : '0%',
+    top             : '0%',
     height          : '98ch',
     width           : '80ch',
     minHeight       : '23ch',
@@ -141,7 +143,7 @@ runeworks.chatbox = (function() {
       /* UI */
       // modify Markup
       this.markup = markupTemplate.replace(UUIDRegex, this.uuid)
-      // add Markup
+      // insert Markup
       this.parent.insertAdjacentHTML('beforeend', this.markup)
       // accessor for self
       this.self = document.querySelector('#rwc-' + this.uuid)
@@ -172,6 +174,16 @@ runeworks.chatbox = (function() {
 
       // modify Line Markup
       this.lineMarkup = lineTemplate.replace(UUIDRegex, this.uuid)
+      
+      // adjust X, Y, custom CSS
+      this.addCSS(`
+        #rwc-${this.uuid} {
+          left  : ${!options ? defaults.left  : options?.left   ? options?.left  : defaults.left  };
+          top   : ${!options ? defaults.top   : options?.top    ? options?.top   : defaults.top   };
+          height: ${!options ? defaults.height: options?.height ? options?.height: defaults.height};
+          width : ${!options ? defaults.width : options?.width  ? options?.width : defaults.width };
+        }
+      `, '#rwc-' + this.uuid, this.cssIdentifier)
  
       /* Eventify */
       // Start listening
@@ -772,6 +784,8 @@ runeworks.chatbox = (function() {
   /* RWChatBox */
   .rwc-container {
     position  : absolute;
+    left      : ${defaults.left    };
+    top       : ${defaults.top     };
     height    : ${defaults.height  };
     width     : ${defaults.width   };
     min-height: ${defaults.minHeight};
