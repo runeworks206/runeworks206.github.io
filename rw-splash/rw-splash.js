@@ -22,8 +22,10 @@ runeworks.splash = (function() {
   let titleText         = 'a runeworks206 production'
   let splash64          = runeworks.splash64
   let splashImageFactor = 0.5
-  let splashDelay       = 4500
+  let splashDelay       = 3600
   let fadeOutDelay      = 1450
+  let typeSpeed         = 88
+  let typeVariance      = 14
   // In-memory variables
   // Computational variables
 
@@ -83,7 +85,7 @@ runeworks.splash = (function() {
     if (i < text.length) {
       target.innerHTML = text.substring(0, i + 1) + '<span aria-hidden="true" class="runeworks-caret"></span>'
       
-      await sleep(Math.random() * 22 + 100)
+      await sleep(Math.random() * typeVariance + typeSpeed)
       return typeWriter(target, text, i + 1, fnCallback)
     } else {
       await sleep(splashDelay)
