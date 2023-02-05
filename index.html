@@ -31,7 +31,7 @@ let sendToServer = function(message, channel) {
 }
 // your server receiving chat data
 let receiveAtServer = function(message, channel) {
-  // identify sender here
+  // identify sender here && implement serverside verification if required
   let user = 'smolprotecc'
   broadcastToAll(message, channel, user) 
 }
@@ -74,6 +74,7 @@ document.addEventListener("DOMContentLoaded", async function(event) {
   document.querySelector('body').addEventListener('rw-raise-message-' + yourChatbox, (e) => {
     let message = e.detail[0]
     let channel = e.detail[1]
+    // your implementations of jsonWebToken or some other authy protocol here to transmit back to your server
     sendToServer(message, channel)
   })
 })
