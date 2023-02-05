@@ -15,6 +15,7 @@ runeworks.chatbox = (function() {
     defaultChannel  : 'main',
     channels        : ['main','notifications'],
     commandsLimit   : 5,
+    scrollbackLimit : 100,
     // functions
     uuid            : function() {
       let d = new Date().getTime()
@@ -103,6 +104,7 @@ runeworks.chatbox = (function() {
   // Computational variables
   let UUIDRegex = /UUID/g
   
+
   class RWChatBox {
     constructor(options) {
       this.outputs   = {}
@@ -115,10 +117,12 @@ runeworks.chatbox = (function() {
       // Helper function
       this.raiseEvent = raiseEvent
       this.addCSS     = addCSS
+      this.getUUID    = defaults.uuid
 
       // settings
-      this.defaultChannel = !options ? defaults.defaultChannel : options?.defaultChannel ? options?.defaultChannel : defaults.defaultChannel
-      this.commandsLimit  = !options ? defaults.commandsLimit  : options?.commandsLimit  ? options?.commandsLimit  : defaults.commandsLimit
+      this.defaultChannel  = !options ? defaults.defaultChannel  : options?.defaultChannel  ? options?.defaultChannel  : defaults.defaultChannel
+      this.commandsLimit   = !options ? defaults.commandsLimit   : options?.commandsLimit   ? options?.commandsLimit   : defaults.commandsLimit
+      this.scrollbackLimit = !options ? defaults.scrollbackLimit : options?.scrollbackLimit ? options?.scrollbackLimit : defaults.scrollbackLimit
 
       // generate UUID
       this.uuid   = !options ? defaults.uuid() : options?.uuid ? options?.uuid : defaults.uuid()
@@ -323,6 +327,9 @@ runeworks.chatbox = (function() {
       let e = this.outputs[c].element
       let m = this.outputs[d].element
       
+      // generate uuid
+      let lineUUID = this.getUUID()
+      
       // modify time
       let ti   = new Date(timestamp)
       let time = ti.getHours().toString().padStart(2,'0')
@@ -334,12 +341,64 @@ runeworks.chatbox = (function() {
       t = t.replace('REPLACE_MESSAGE',   msg )
            .replace('REPLACE_SPEAKER',   user)
            .replace('REPLACE_TIMESTAMP', time)
+           .replace('LineID', lineUUID)
+           
+      // add
+      // Fastdom
+      if (fastdom) {
+        fastdom.measure(() => {
+          fastdom.mutate(() => {
+            e.insertAdjacentHTML('beforeend', t)
+            e.scrollTop = e.scrollHeight
+            if (c != d) {
+              m.insertAdjacentHTML('beforeend', t)
+              m.scrollTop = m.scrollHeight
+            }
+          })
+        })
+      } else {
+        e.insertAdjacentHTML('beforeend', t)
+        e.scrollTop = e.scrollHeight
+        if (c != d) {
+          m.insertAdjacentHTML('beforeend', t)
+          m.scrollTop = m.scrollHeight
+        }
+      }
       
-      e.insertAdjacentHTML('beforeend', t)
-      e.scrollTop = e.scrollHeight
-      if (c != d) {
-        m.insertAdjacentHTML('beforeend', t)
-        m.scrollTop = m.scrollHeight
+      // push into buffer
+      let main = this.outputs[`rwc-output-${this.uuid}-main`].buffer
+      let line = {
+        message: msg,
+        user   : user,
+        time   : timestamp,
+        channel: channel,
+        id     : lineUUID,
+      }
+      // push
+      main.push(line)
+      
+      // remove excess lines
+      if (main.length > this.scrollbackLimit) {
+        let outgoing = main.shift()
+        // remove from buffers
+        for (var key in this.outputs) {
+          this.outputs[key].buffer = this.outputs[key].buffer.filter(_line => _line.id != outgoing.id)
+        }
+        // remove actual elements
+        let f = document.querySelectorAll(`#rwc-${outgoing.id}`)
+        for (var i = 0; i < f.length; i++) {
+          let element = f[i]
+          // Fastdom
+          if (fastdom) {
+            fastdom.measure(() => {
+              fastdom.mutate(() => {
+                element.remove()
+              })
+            })
+          } else {
+            element.remove()
+          }
+        }
       }
     }
 
@@ -429,7 +488,16 @@ runeworks.chatbox = (function() {
         t = t.replace('rwc-arrow-right','rwc-arrow-right invalid')
       }
       	
-      document.querySelector('#rwc-tabs-navigator-' + this.uuid).insertAdjacentHTML('beforeend', t)
+      // Fastdom
+      if (fastdom) {
+        fastdom.measure(() => {
+          fastdom.mutate(() => {
+            document.querySelector('#rwc-tabs-navigator-' + this.uuid).insertAdjacentHTML('beforeend', t)
+          })
+        })
+      } else {
+        document.querySelector('#rwc-tabs-navigator-' + this.uuid).insertAdjacentHTML('beforeend', t)
+      }
     }
 
     // UX Functions
@@ -448,8 +516,18 @@ runeworks.chatbox = (function() {
         m = f[0].name + ' is typing...'
       }
       let g = document.querySelector('.rwc-footer-status')
-      g.innerHTML = ''
-      g.insertAdjacentHTML('beforeend', m)
+      // Fastdom
+      if (fastdom) {
+        fastdom.measure(() => {
+          fastdom.mutate(() => {
+            g.innerHTML = ''
+            g.insertAdjacentHTML('beforeend', m)
+          })
+        })
+      } else {
+        g.innerHTML = ''
+        g.insertAdjacentHTML('beforeend', m)
+      }
     }
 
     arrowLeft() {
@@ -515,6 +593,7 @@ runeworks.chatbox = (function() {
       this.outputs[id] = {
         id     : data.identifier,
         element: document.querySelector('#' + id),
+        buffer : [],
       }
       // add tabs
       id = 'rwc-tab-' + this.uuid + '-' + data.identifier
@@ -659,6 +738,7 @@ runeworks.chatbox = (function() {
       return false
     }
   }
+
 
   /* Templates */
   let lineTemplate = `
@@ -927,7 +1007,7 @@ runeworks.chatbox = (function() {
     height        : ${defaults.inputBoxHeight};
   }
   `
-  
+
   // Expose raiseEvent if does not exist
   if (!window.raiseEvent) {
     window.raiseEvent = raiseEvent
