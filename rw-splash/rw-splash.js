@@ -24,7 +24,7 @@ runeworks.splash = (function() {
   let splashImageFactor = 0.5
   let splashDelay       = 3600
   let fadeOutDelay      = 1450
-  let typeSpeed         = 88
+  let typeSpeed         = 56
   let typeVariance      = 14
   // In-memory variables
   // Computational variables
