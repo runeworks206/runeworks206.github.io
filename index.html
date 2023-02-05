@@ -36,7 +36,7 @@ let receiveAtServer = function(message, channel) {
   broadcastToAll(message, channel, user) 
 }
 // your server broadcasting data to appropriate people
-let broadCastToAll = function(message, channel, user) {
+let broadcastToAll = function(message, channel, user) {
   let timestamp = new Date().getTime()
   receiveAtWebpage(message, channel, user, timestamp) 
 }
