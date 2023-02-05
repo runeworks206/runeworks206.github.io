@@ -927,6 +927,11 @@ runeworks.chatbox = (function() {
     height        : ${defaults.inputBoxHeight};
   }
   `
+  
+  // Expose raiseEvent if does not exist
+  if (!window.raiseEvent) {
+    window.raiseEvent = raiseEvent
+  }
 
   return {
     new: RWChatBox.create,
