@@ -140,7 +140,7 @@ runeworks.utility = (function() {
      let arr4 = [{num: 1}, {num: 2}, {num: 3}]
      console.log(combineObjects([arr3, arr4]))
    */
-  let combineObjects = ([head, ....[headTail, ...tailTail]]) => {
+  let combineObjects = ([head, ...[headTail, ...tailTail]]) => {
     if (!headTail) return head
     
     const combined = headTail.reduce((acc, x) => {
