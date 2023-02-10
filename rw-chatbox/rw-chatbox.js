@@ -194,6 +194,17 @@ runeworks.chatbox = (function() {
     }
 
     /* Eventification */
+    unlisten() {
+      let body = document.querySelector('body')
+      body.removeEventListener(this.events['receiveMessage'], this.receiveMessage.bind(this))
+      body.removeEventListener(this.events['receiveData'], this.processData.bind(this))
+      body.removeEventListener(this.events['userTyping'], this.userTyping.bind(this))
+      body.removeEventListener(this.events['userStopped'], this.userStopped.bind(this))
+      body.removeEventListener(this.events['tabSwitch'], this.tabSwitch.bind(this))
+      body.removeEventListener(this.events['arrowLeft'], this.arrowLeft.bind(this))
+      body.removeEventListener(this.events['arrowRight'], this.arrowRight.bind(this))
+    }
+     
     listen() {
       let body = document.querySelector('body')
       Object.keys(this.events).forEach((e,i) => {
@@ -709,6 +720,12 @@ runeworks.chatbox = (function() {
       // the :not() selector isn't working but we'll roll with this for now
       document.querySelector('#' + 'rwc-header-' + this.uuid + ':not(.rwc-tab)').onmousedown = mouseDown
       document.querySelector('#' + this.self.id + ' .rwc-footer-handler').onmousedown = mouseDown
+    }
+
+    remove() {
+      this.unlisten() // this doesn't work well 
+      this.resizeObserver.disconnect()
+      document.querySelector('#rwc-' + this.uuid).remove()
     }
 
     static async create(options) {
