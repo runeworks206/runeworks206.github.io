@@ -127,6 +127,7 @@ runeworks.chatbox = (function() {
       this.users     = []
       this.roles     = []
       this.commands  = []
+      this.previousText = ''
 
       // Helper function
       this.raiseEvent = raiseEvent
@@ -199,6 +200,7 @@ runeworks.chatbox = (function() {
           top   : ${!options ? defaults.top   : options?.top    ? options?.top   : defaults.top   };
           height: ${!options ? defaults.height: options?.height ? options?.height: defaults.height};
           width : ${!options ? defaults.width : options?.width  ? options?.width : defaults.width };
+          min-width: ${!options ? defaults.minWidth : options?.minWidth ? options?.minWidth : defaults.minWidth };
         }
       `, '#rwc-' + this.uuid, this.cssIdentifier)
  
@@ -207,7 +209,11 @@ runeworks.chatbox = (function() {
       this.listen()
 
       // make draggable
-      this.draggable(this)
+      if (options && typeof options.draggable != 'undefined' && options?.draggable == false) {
+        // not draggable
+      } else {
+        this.draggable(this)
+      }
     }
 
     /* Eventification */
@@ -262,7 +268,10 @@ runeworks.chatbox = (function() {
             let n = this.input.value.length
             if (n > 0) {
               this.typingStatus()
+            } else if (this.previousText.length == 1 && n == 0) {
+              this.resetTyping()
             }
+            this.previousText = this.input.value
             break;
         }
       })
@@ -503,10 +512,12 @@ runeworks.chatbox = (function() {
     }
     
     typingStatus() {
+      let previousTime;
       if (typeof this.typingTimer == 'undefined' || this.typingTimer == 0) {
+        this.typingTimer = new Date().getTime()
         this.raiseEvent(this.body, this.events.startTyping)
       } else {
-        let previousTime = this.typingTimer
+        previousTime = this.typingTimer
         this.typingTimer = new Date().getTime()
       }
       if ((this.typingTimer - previousTime) > this.typingTimeout) {
