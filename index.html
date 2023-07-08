@@ -30,6 +30,7 @@
 </body>
 <script>
 let yourChatbox = 'thisChatbox'
+let offset      = 25
   
 /* dummy functions */
 // your application sending to server
@@ -63,6 +64,7 @@ let receiveAtWebpage = function(message, channel, user, timestamp) {
 document.addEventListener("DOMContentLoaded", async function(event) {
   console.log(runeworks)
   
+  /*
   let rws = runeworks.splash.start({
     fadeOutDelay: 1100,
   })
@@ -70,17 +72,20 @@ document.addEventListener("DOMContentLoaded", async function(event) {
   // Your intermediate code here
   rws.next()
   // Continue here
-  
+  */
   
   let chatA = await runeworks.chatbox.new({
     uuid    : yourChatbox,
     channels: ['main','admin','notifs','a','b','c','d','e','f'],
-    left    :  '8%',
-    top     : '13%',
+    right   : offset + 'px',
+    bottom  : offset + 'px',
     height  : '80vh',
     width   : '23vw',
   })
   console.log(chatA)
+  
+  chatA.self.style.backdropFilter = 'blur(6px)'
+  chatA.self.style.webkitBackdropFilter = 'blur(6px)'
   
   document.querySelector('body').addEventListener('rw-raise-message-' + yourChatbox, (e) => {
     let message = e.detail[0]

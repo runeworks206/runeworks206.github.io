@@ -32,6 +32,8 @@ runeworks.chatbox = (function() {
     // Container
     left            : '0%',
     top             : '0%',
+    right           : '0%',
+    bottom          : '0%',
     height          : '98ch',
     width           : '80ch',
     minHeight       : '23ch',
@@ -194,10 +196,21 @@ runeworks.chatbox = (function() {
       this.lineMarkup = lineTemplate.replace(UUIDRegex, this.uuid)
       
       // adjust X, Y, custom CSS
+      let vertical, horizontal;
+      if (options && options?.bottom) {
+        vertical = `bottom : ${options.bottom};`
+      } else {
+        vertical = `top    : ${!options ? defaults.top : options?.top ? options?.top : defaults.top};`
+      }
+      if (options && options?.right) {
+        horizontal = `right : ${options.right};`
+      } else {
+        horizontal = `left  : ${!options ? defaults.left : options?.left ? options?.left : defaults.left};`
+      }
       this.addCSS(`
         #rwc-${this.uuid} {
-          left  : ${!options ? defaults.left  : options?.left   ? options?.left  : defaults.left  };
-          top   : ${!options ? defaults.top   : options?.top    ? options?.top   : defaults.top   };
+          ${vertical}
+          ${horizontal}
           height: ${!options ? defaults.height: options?.height ? options?.height: defaults.height};
           width : ${!options ? defaults.width : options?.width  ? options?.width : defaults.width };
           min-width: ${!options ? defaults.minWidth : options?.minWidth ? options?.minWidth : defaults.minWidth };
@@ -974,8 +987,6 @@ runeworks.chatbox = (function() {
   /* RWChatBox */
   .rwc-container {
     position  : absolute;
-    left      : ${defaults.left    };
-    top       : ${defaults.top     };
     height    : ${defaults.height  };
     width     : ${defaults.width   };
     min-height: ${defaults.minHeight};
